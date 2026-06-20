@@ -13,10 +13,18 @@ if ! command -v docker &>/dev/null; then
   exit 1
 fi
 
-if ! docker compose version &>/dev/null; then
-  echo "Docker Compose plugin is not available."
+if docker compose version &>/dev/null 2>&1; then
+  COMPOSE="docker compose"
+elif command -v docker-compose &>/dev/null; then
+  COMPOSE="docker-compose"
+else
+  echo "Neither 'docker compose' nor 'docker-compose' is available."
+  echo "Install the Compose plugin: sudo apt install docker-compose-plugin"
+  echo "Or standalone Compose: sudo apt install docker-compose"
   exit 1
 fi
+
+echo "Using: ${COMPOSE}"
 
 export APP_PORT
 

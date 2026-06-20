@@ -142,12 +142,15 @@ Second chest in the tower
 ### 1. Подготовка сервера
 
 ```bash
-# Docker + Compose plugin
+# Docker + Compose (plugin или standalone)
 sudo apt update
-sudo apt install -y docker.io docker-compose-plugin curl git
+sudo apt install -y docker.io curl git
+sudo apt install -y docker-compose-plugin || sudo apt install -y docker-compose
 sudo usermod -aG docker $USER
 # перелогиниться, чтобы группа docker применилась
 ```
+
+`deploy.sh` автоматически использует `docker compose` или `docker-compose` — что установлено на сервере.
 
 ### 2. Self-hosted runner
 
