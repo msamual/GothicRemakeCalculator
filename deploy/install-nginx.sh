@@ -2,17 +2,23 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE="${SCRIPT_DIR}/msamual.online.conf"
 TARGET="/etc/nginx/sites-available/msamual.online"
+CERT="/etc/letsencrypt/live/msamual.online/fullchain.pem"
+
+if sudo test -f "${CERT}"; then
+  SOURCE="${SCRIPT_DIR}/msamual.online.conf"
+  echo "Using HTTPS config (certificate found)."
+else
+  SOURCE="${SCRIPT_DIR}/msamual.online.http-only.conf"
+  echo "Using HTTP-only config (no certificate yet)."
+  echo "After HTTP works, run: sudo certbot --nginx -d msamual.online"
+fi
 
 if [ ! -f "${SOURCE}" ]; then
   echo "Config not found: ${SOURCE}"
-  echo "Run this script from the repository checkout, e.g.:"
-  echo "  find /home/github-runner -path '*/deploy/install-nginx.sh' 2>/dev/null"
   exit 1
 fi
 
-# nginx ignores comments, but strip them to keep the active config minimal
 awk '
   /^[[:space:]]*#/ { next }
   /^[[:space:]]*$/ && !in_server { next }
@@ -27,17 +33,16 @@ sudo nginx -t
 sudo systemctl reload nginx
 echo "Nginx reloaded."
 
-echo "Test (HTTP):"
+echo "Test (local app):"
 curl -fsS "http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo
-curl -fsS "http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo
 
-if curl -fsS "https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" >/dev/null 2>&1; then
-  echo "HTTPS is configured."
+echo "Test (public HTTP):"
+curl -fsS "http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo || echo "HTTP check failed."
+
+echo "Test (public HTTPS):"
+if curl -fsS "https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo; then
+  echo "HTTPS OK."
 else
-  echo
-  echo "HTTPS is NOT configured yet. Browsers often open https:// by default and fail."
-  echo "Open in browser: http://msamual.online/GothicReamakeLockPuzzleCalculator/"
-  echo "To enable HTTPS:"
-  echo "  sudo apt install -y certbot python3-certbot-nginx"
-  echo "  sudo certbot --nginx -d msamual.online"
+  echo "HTTPS failed. If certificates exist, re-run: sudo ./deploy/install-nginx.sh"
+  echo "Temporary URL: http://msamual.online/GothicReamakeLockPuzzleCalculator/"
 fi
