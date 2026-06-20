@@ -5,36 +5,68 @@
 }
 
 .app-header {
+  position: relative;
   border-bottom: 1px solid var(--color-gothic-border);
-  background: linear-gradient(180deg, rgb(34 28 22 / 0.95) 0%, rgb(15 13 10 / 0.85) 100%);
+  background:
+    radial-gradient(ellipse 60% 120% at 50% 0%, rgb(212 175 86 / 0.08) 0%, transparent 70%),
+    linear-gradient(180deg, rgb(34 28 21 / 0.9) 0%, rgb(12 10 7 / 0) 100%);
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(212 175 86 / 0.4) 50%,
+    transparent
+  );
 }
 
 .app-header__inner {
   max-width: 72rem;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 1.25rem;
+  padding: 2.25rem 1.25rem 1.75rem;
+  text-align: center;
 }
 
 .app-kicker {
   margin: 0;
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--color-gothic-bronze);
+  font-weight: 600;
 }
 
 .app-title {
-  margin: 0.25rem 0 0;
+  margin: 0.35rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 4vw, 2.35rem);
-  color: var(--color-gothic-gold);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  background: linear-gradient(180deg, #f3e0a8 0%, var(--color-gothic-gold) 55%, #9c7a23 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 18px rgb(212 175 86 / 0.2);
+}
+
+.app-title-divider {
+  max-width: 26rem;
+  margin: 0.9rem auto 0;
 }
 
 .app-tagline {
-  margin: 0.75rem 0 0;
-  max-width: 42rem;
+  margin: 0.9rem auto 0;
+  max-width: 40rem;
   color: var(--color-gothic-muted);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .app-main {
@@ -42,13 +74,13 @@
   max-width: 72rem;
   width: 100%;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 1.75rem 1.25rem;
   box-sizing: border-box;
 }
 
 .app-footer {
   border-top: 1px solid var(--color-gothic-border);
-  padding: 1rem 1.25rem 1.5rem;
+  padding: 1.25rem 1.25rem 1.75rem;
   text-align: center;
   color: var(--color-gothic-muted);
   font-size: 0.85rem;
@@ -56,4 +88,12 @@
 
 .app-footer a {
   color: var(--color-gothic-gold);
+  text-decoration: none;
+  border-bottom: 1px solid rgb(212 175 86 / 0.35);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.app-footer a:hover {
+  color: var(--color-gothic-gold-bright);
+  border-bottom-color: var(--color-gothic-gold);
 }

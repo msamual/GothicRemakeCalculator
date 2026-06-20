@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gothic-bg: #0f0d0a;
-  --color-gothic-card: #1a1612;
+  --color-gothic-bg: #0c0a07;
+  --color-gothic-card: #181410;
   --color-gothic-border: #3d3428;
-  --color-gothic-gold: #c9a84c;
+  --color-gothic-gold: #d4af56;
+  --color-gothic-gold-bright: #f0d890;
   --color-gothic-bronze: #8b6914;
-  --color-gothic-text: #e8dcc8;
+  --color-gothic-text: #ece2cf;
   --color-gothic-muted: #9a8f7a;
-  --color-gothic-goal: #4a7c59;
+  --color-gothic-goal: #5b9e6f;
+  --color-gothic-danger: #c96a5a;
   --font-display: "Cinzel", Georgia, serif;
   --font-body: "Source Sans 3", system-ui, sans-serif;
 }
@@ -21,71 +23,164 @@ body {
 body {
   margin: 0;
   font-family: var(--font-body);
-  background:
-    radial-gradient(ellipse at top, #1f1812 0%, var(--color-gothic-bg) 55%),
-    var(--color-gothic-bg);
   color: var(--color-gothic-text);
+  background-color: var(--color-gothic-bg);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -10%, rgb(63 48 26 / 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 60% at 85% 110%, rgb(40 60 48 / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 10% 100%, rgb(60 40 30 / 0.2) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-attachment: fixed;
 }
 
+/* ---------- Cards ---------- */
 .gothic-card {
-  background: linear-gradient(180deg, #221c16 0%, var(--color-gothic-card) 100%);
+  position: relative;
+  background:
+    linear-gradient(180deg, rgb(40 33 25 / 0.55) 0%, transparent 18%),
+    linear-gradient(180deg, #221c15 0%, var(--color-gothic-card) 100%);
   border: 1px solid var(--color-gothic-border);
+  border-radius: 0.85rem;
   box-shadow:
-    inset 0 1px 0 rgb(201 168 76 / 0.08),
-    0 12px 32px rgb(0 0 0 / 0.35);
+    inset 0 1px 0 rgb(212 175 86 / 0.1),
+    inset 0 0 40px rgb(0 0 0 / 0.35),
+    0 18px 40px rgb(0 0 0 / 0.45);
 }
 
+/* Thin gilded top accent line */
+.gothic-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 1.25rem auto;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(212 175 86 / 0.5) 20%,
+    rgb(240 216 144 / 0.8) 50%,
+    rgb(212 175 86 / 0.5) 80%,
+    transparent
+  );
+}
+
+/* ---------- Inputs ---------- */
 .gothic-input {
   width: 100%;
-  border-radius: 0.375rem;
+  border-radius: 0.45rem;
   border: 1px solid var(--color-gothic-border);
-  background: rgb(15 13 10 / 0.8);
+  background: rgb(8 7 5 / 0.85);
   color: var(--color-gothic-text);
-  padding: 0.5rem 0.75rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  padding: 0.55rem 0.8rem;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.45);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.gothic-input::placeholder {
+  color: rgb(154 143 122 / 0.6);
+}
+
+.gothic-input:hover {
+  border-color: rgb(139 105 20 / 0.8);
 }
 
 .gothic-input:focus {
   outline: none;
   border-color: var(--color-gothic-gold);
-  box-shadow: 0 0 0 2px rgb(201 168 76 / 0.15);
+  background: rgb(15 13 10 / 0.95);
+  box-shadow:
+    inset 0 1px 3px rgb(0 0 0 / 0.45),
+    0 0 0 3px rgb(212 175 86 / 0.18);
 }
 
 .gothic-input.invalid {
-  border-color: #b44;
+  border-color: var(--color-gothic-danger);
 }
 
+/* ---------- Buttons ---------- */
 .gothic-btn {
-  border-radius: 0.375rem;
+  position: relative;
+  border-radius: 0.45rem;
   border: 1px solid var(--color-gothic-bronze);
-  background: linear-gradient(180deg, #6b5310 0%, #4a3a0c 100%);
+  background: linear-gradient(180deg, #2c2519 0%, #1c1710 100%);
   color: #f5ecd5;
-  padding: 0.55rem 1rem;
+  padding: 0.55rem 1.1rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: transform 0.1s ease, filter 0.15s ease;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 2px 6px rgb(0 0 0 / 0.35);
+  transition: transform 0.1s ease, filter 0.15s ease, box-shadow 0.15s ease;
 }
 
 .gothic-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 4px 12px rgb(0 0 0 / 0.4);
 }
 
 .gothic-btn:active:not(:disabled) {
   transform: translateY(1px);
 }
 
+.gothic-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(212 175 86 / 0.3);
+}
+
 .gothic-btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .gothic-btn-secondary {
   border-color: var(--color-gothic-border);
-  background: rgb(26 22 18 / 0.9);
+  background: linear-gradient(180deg, #211b14 0%, #15110c 100%);
   color: var(--color-gothic-text);
 }
 
 .gothic-btn-primary {
   border-color: var(--color-gothic-gold);
-  background: linear-gradient(180deg, #a8862f 0%, #7a6118 100%);
+  background: linear-gradient(180deg, #c79b3a 0%, #8a6c1c 100%);
+  color: #2a2008;
+  text-shadow: 0 1px 0 rgb(255 240 200 / 0.4);
+  box-shadow:
+    inset 0 1px 0 rgb(255 240 200 / 0.45),
+    0 2px 10px rgb(212 175 86 / 0.25);
+}
+
+.gothic-btn-primary:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgb(255 240 200 / 0.5),
+    0 4px 16px rgb(212 175 86 / 0.4);
+}
+
+/* ---------- Ornamental divider ---------- */
+.gothic-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-gothic-gold);
+}
+
+.gothic-divider::before,
+.gothic-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(212 175 86 / 0.45));
+}
+
+.gothic-divider::after {
+  background: linear-gradient(90deg, rgb(212 175 86 / 0.45), transparent);
+}
+
+.gothic-divider__gem {
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, var(--color-gothic-gold-bright), var(--color-gothic-bronze));
+  box-shadow: 0 0 8px rgb(212 175 86 / 0.5);
 }

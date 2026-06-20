@@ -8,7 +8,7 @@
     </header>
 
     <form [formGroup]="form" class="editor-form" (ngSubmit)="solve()">
-      <label class="field">
+      <label class="field plate-count-field">
         <span class="field__label">Количество пластин</span>
         <input
           class="gothic-input"
@@ -21,7 +21,7 @@
 
       <div class="rules-grid">
         <div class="rules-grid__header">
-          <span>Пластина</span>
+          <span class="rules-grid__col-num">№</span>
           <span>Правило (при D)</span>
           <span>Старт</span>
         </div>
@@ -57,6 +57,7 @@
         <button type="button" class="gothic-btn gothic-btn-secondary" (click)="exportText()">
           Экспорт
         </button>
+        <span class="actions__spacer"></span>
         <button type="submit" class="gothic-btn gothic-btn-primary" [disabled]="loading()">
           @if (loading()) {
             Решаем…
@@ -77,6 +78,12 @@
       <h2 class="panel-title">Пластины</h2>
       <p class="panel-subtitle">Позиция 4 — центр (цель взлома)</p>
     </header>
+
+    <div class="viz-legend">
+      <span class="viz-legend__item">1 — правый край</span>
+      <span class="viz-legend__item viz-legend__item--goal">4 — цель</span>
+      <span class="viz-legend__item">7 — левый край</span>
+    </div>
 
     @for (position of positions(); track $index; let i = $index) {
       <app-plate-track [plateIndex]="i + 1" [position]="position" />

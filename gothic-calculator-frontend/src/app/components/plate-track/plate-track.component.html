@@ -1,6 +1,10 @@
 <div class="track-row">
-  <div class="track-label">Пластина {{ plateIndex() }}</div>
-  <div class="track-slots" role="group" [attr.aria-label]="'Пластина ' + plateIndex()">
+  <div class="track-label">
+    <span class="track-label__index">{{ plateIndex() }}</span>
+    <span class="track-label__text">Пластина</span>
+  </div>
+  <div class="track-rail" role="group" [attr.aria-label]="'Пластина ' + plateIndex()">
+    <span class="track-rail__line" aria-hidden="true"></span>
     @for (slot of slots; track slot) {
       <div
         class="track-slot"
@@ -14,10 +18,5 @@
         }
       </div>
     }
-  </div>
-  <div class="track-hint">
-    <span>1 — правый край</span>
-    <span>{{ goalPosition }} — цель</span>
-    <span>7 — левый край</span>
   </div>
 </div>
