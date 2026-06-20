@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_PORT="${APP_PORT:-8080}"
-BASE_PATH="${BASE_PATH:-/GothicReamakeLockPuzzleCalculator}"
+BASE_PATH="${BASE_PATH:-/GothicRemakeLockPuzzleCalculator}"
 BASE_PATH="${BASE_PATH%/}"
 case "${BASE_PATH}" in
   /*) ;;

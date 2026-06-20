@@ -34,15 +34,15 @@ sudo systemctl reload nginx
 echo "Nginx reloaded."
 
 echo "Test (local app):"
-curl -fsS "http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo
+curl -fsS "http://127.0.0.1:8080/GothicRemakeLockPuzzleCalculator/api/lock/health" && echo
 
 echo "Test (public HTTP):"
-curl -fsS "http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo || echo "HTTP check failed."
+curl -fsS "http://msamual.online/GothicRemakeLockPuzzleCalculator/api/lock/health" && echo || echo "HTTP check failed."
 
 echo "Test (public HTTPS):"
-if curl -fsS "https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo; then
+if curl -fsS "https://msamual.online/GothicRemakeLockPuzzleCalculator/api/lock/health" && echo; then
   echo "HTTPS OK."
 else
   echo "HTTPS failed. If certificates exist, re-run: sudo ./deploy/install-nginx.sh"
-  echo "Temporary URL: http://msamual.online/GothicReamakeLockPuzzleCalculator/"
+  echo "Temporary URL: http://msamual.online/GothicRemakeLockPuzzleCalculator/"
 fi

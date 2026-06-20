@@ -33,7 +33,7 @@ make docker-up
 docker compose up -d --build
 ```
 
-Откройте http://localhost:8080/GothicReamakeLockPuzzleCalculator/
+Откройте http://localhost:8080/GothicRemakeLockPuzzleCalculator/
 
 ### Локальная разработка
 
@@ -208,7 +208,7 @@ export APP_PORT=8080
 
 Приложение публикуется по пути:
 
-**https://msamual.online/GothicReamakeLockPuzzleCalculator/**
+**https://msamual.online/GothicRemakeLockPuzzleCalculator/**
 
 #### Диагностика (на сервере)
 
@@ -251,8 +251,8 @@ sudo nginx -t && sudo systemctl reload nginx
 Проверка:
 
 ```bash
-curl http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health
-curl http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health
+curl http://127.0.0.1:8080/GothicRemakeLockPuzzleCalculator/api/lock/health
+curl http://msamual.online/GothicRemakeLockPuzzleCalculator/api/lock/health
 ```
 
 #### HTTPS
@@ -264,13 +264,13 @@ sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d msamual.online
 ```
 
-Контейнер слушает `:8080` и сам обслуживает подпуть `/GothicReamakeLockPuzzleCalculator/`.
+Контейнер слушает `:8080` и сам обслуживает подпуть `/GothicRemakeLockPuzzleCalculator/`.
 
 ### 6. Проверка после деплоя
 
 ```bash
-curl http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health
-curl -k https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health
+curl http://127.0.0.1:8080/GothicRemakeLockPuzzleCalculator/api/lock/health
+curl -k https://msamual.online/GothicRemakeLockPuzzleCalculator/api/lock/health
 docker compose ps
 docker compose logs -f api
 ```

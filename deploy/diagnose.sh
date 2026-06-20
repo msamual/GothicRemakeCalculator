@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-BASE_PATH="/GothicReamakeLockPuzzleCalculator"
+BASE_PATH="/GothicRemakeLockPuzzleCalculator"
 PORT="${APP_PORT:-8080}"
 
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-gothiclock}"
@@ -27,7 +27,7 @@ ss -tlnp | grep ":${PORT} " || echo "Nothing listening on port ${PORT}"
 
 echo
 echo "=== Nginx config for msamual.online ==="
-grep -r "GothicReamakeLockPuzzleCalculator\|msamual.online" /etc/nginx/ 2>/dev/null || echo "No nginx config found for this app"
+grep -r "GothicRemakeLockPuzzleCalculator\|msamual.online" /etc/nginx/ 2>/dev/null || echo "No nginx config found for this app"
 
 echo
 echo "=== Public HTTP check ==="
