@@ -36,12 +36,39 @@ run_compose_legacy_down() {
 remove_compose_project_containers() {
   local project=$1
   local ids=""
+  local id=""
+  local name=""
 
   ids=$("${DOCKER_CMD[@]}" ps -aq --filter "label=com.docker.compose.project=${project}" 2>/dev/null || true)
-  if [ -n "${ids}" ]; then
-    echo "Removing containers for compose project ${project}..."
-    # shellcheck disable=SC2086
-    "${DOCKER_CMD[@]}" rm -f ${ids} 2>/dev/null || true
+
+  for name in \
+    "${project}_api_1" \
+    "${project}_frontend_1" \
+    "${project}-api-1" \
+    "${project}-frontend-1"; do
+    id=$("${DOCKER_CMD[@]}" container inspect -f '{{.Id}}' "${name}" 2>/dev/null || true)
+    if [ -n "${id}" ]; then
+      ids="${ids} ${id}"
+    fi
+  done
+
+  ids=$(printf '%s\n' ${ids} | awk 'NF' | sort -u | tr '\n' ' ')
+  ids="${ids%" "}"
+
+  if [ -z "${ids}" ]; then
+    return 0
+  fi
+
+  echo "Removing containers for compose project ${project}..."
+  # shellcheck disable=SC2086
+  if ! "${DOCKER_CMD[@]}" rm -f ${ids}; then
+    if [ "${DOCKER_CMD[0]}" != "sudo" ] && sudo -n "${DOCKER_CMD[@]}" rm -f ${ids} 2>/dev/null; then
+      echo "Removed containers using sudo."
+    else
+      echo "Failed to remove containers: ${ids}"
+      "${DOCKER_CMD[@]}" ps -a --filter "id=${ids// /,}" || true
+      return 1
+    fi
   fi
 }
 
@@ -130,6 +157,8 @@ if [ "${COMPOSE_MODE}" = "plugin" ]; then
   }
 else
   # docker-compose v1 cannot recreate containers on modern Docker (KeyError: ContainerConfig).
+  echo "Stopping existing services (docker-compose v1 workaround)..."
+  run_compose down --remove-orphans 2>/dev/null || true
   echo "Removing old containers before up (docker-compose v1 workaround)..."
   remove_compose_project_containers "${COMPOSE_PROJECT_NAME}"
   run_compose up -d --remove-orphans
