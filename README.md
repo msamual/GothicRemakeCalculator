@@ -210,10 +210,58 @@ export APP_PORT=8080
 
 **https://msamual.online/GothicReamakeLockPuzzleCalculator/**
 
-На сервере добавьте фрагмент из [`deploy/nginx-msamual.online.conf`](deploy/nginx-msamual.online.conf) в блок `server` для `msamual.online`, затем:
+#### Диагностика (на сервере)
 
 ```bash
+chmod +x deploy/diagnose.sh
+./deploy/diagnose.sh
+```
+
+#### Установка nginx (обязательно)
+
+Код runner'а лежит **не** в `actions-runner/`, а здесь:
+
+```bash
+find /home/github-runner -maxdepth 5 -type d -name GothicRemakeCalculator 2>/dev/null
+# обычно: .../_work/GothicRemakeCalculator/GothicRemakeCalculator
+```
+
+Установка nginx из checkout:
+
+```bash
+cd /home/github-runner/actions-runner/_work/GothicRemakeCalculator/GothicRemakeCalculator
+chmod +x deploy/install-nginx.sh
+sudo ./deploy/install-nginx.sh
+```
+
+Или вручную (если `location` вне `server {}` — nginx не запустится):
+
+```bash
+sudo nano /etc/nginx/sites-available/msamual.online
+```
+
+Содержимое — только блок `server { ... }` из [`deploy/msamual.online.conf`](deploy/msamual.online.conf) (строки 12–32), **без** `location` отдельно от `server`.
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/msamual.online /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
+```
+
+Проверка:
+
+```bash
+curl http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health
+curl http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health
+```
+
+#### HTTPS
+
+Порт 443 должен быть открыт. После того как HTTP заработает:
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d msamual.online
 ```
 
 Контейнер слушает `:8080` и сам обслуживает подпуть `/GothicReamakeLockPuzzleCalculator/`.
