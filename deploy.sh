@@ -29,11 +29,19 @@ run_compose_legacy_down() {
   if [ "${COMPOSE_MODE}" = "plugin" ]; then
     "${DOCKER_CMD[@]}" compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
   else
-    if [ "${DOCKER_CMD[0]}" = "sudo" ]; then
-      sudo docker-compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
-    else
-      docker-compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
-    fi
+    remove_compose_project_containers "${legacy}"
+  fi
+}
+
+remove_compose_project_containers() {
+  local project=$1
+  local ids=""
+
+  ids=$("${DOCKER_CMD[@]}" ps -aq --filter "label=com.docker.compose.project=${project}" 2>/dev/null || true)
+  if [ -n "${ids}" ]; then
+    echo "Removing containers for compose project ${project}..."
+    # shellcheck disable=SC2086
+    "${DOCKER_CMD[@]}" rm -f ${ids} 2>/dev/null || true
   fi
 }
 
@@ -123,7 +131,7 @@ if [ "${COMPOSE_MODE}" = "plugin" ]; then
 else
   # docker-compose v1 cannot recreate containers on modern Docker (KeyError: ContainerConfig).
   echo "Removing old containers before up (docker-compose v1 workaround)..."
-  run_compose rm -f -s 2>/dev/null || true
+  remove_compose_project_containers "${COMPOSE_PROJECT_NAME}"
   run_compose up -d --remove-orphans
   wait_for_health
 fi

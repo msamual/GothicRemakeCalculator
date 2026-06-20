@@ -13,23 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Ensure Docker Compose v2
+      - name: Check Docker Compose
         run: |
           if docker compose version &>/dev/null 2>&1; then
-            echo "Docker Compose v2 already available:"
-            docker compose version
-            exit 0
-          fi
-          echo "Docker Compose v2 plugin not found; installing..."
-          if command -v apt-get &>/dev/null; then
-            sudo apt-get update -qq
-            sudo apt-get install -y docker-compose-plugin
-          fi
-          if ! docker compose version &>/dev/null 2>&1; then
-            echo "ERROR: docker compose v2 is required (docker-compose v1 fails with KeyError: ContainerConfig)."
+            echo "Docker Compose v2: $(docker compose version)"
+          elif command -v docker-compose &>/dev/null; then
+            echo "WARNING: only docker-compose v1 found ($(docker-compose --version))."
+            echo "deploy.sh will remove containers via docker rm before up."
+            echo "To install v2 on the server (one-time, requires sudo): sudo apt install docker-compose-plugin"
+          else
+            echo "ERROR: neither 'docker compose' nor 'docker-compose' is available."
             exit 1
           fi
-          docker compose version
 
       - name: Deploy application
         working-directory: ${{ github.workspace }}
