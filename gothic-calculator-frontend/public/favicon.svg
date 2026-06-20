@@ -1,15 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Gothic Lock Calculator">
-  <rect width="32" height="32" rx="6" fill="#0f0d0a"/>
+  <rect width="32" height="32" rx="7" fill="#6b5310"/>
+  <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="none" stroke="#c9a84c" stroke-width="1"/>
   <path
-    d="M11 13V10a5 5 0 0 1 10 0v3"
+    d="M11 13.5V10.5a5 5 0 0 1 10 0v3"
     fill="none"
-    stroke="#c9a84c"
-    stroke-width="2.2"
+    stroke="#f5ecd5"
+    stroke-width="2.4"
     stroke-linecap="round"
   />
-  <rect x="8" y="13" width="16" height="14" rx="2.5" fill="#1a1612" stroke="#c9a84c" stroke-width="1.4"/>
-  <rect x="10.5" y="16" width="11" height="2.2" rx="0.6" fill="#8b6914"/>
-  <rect x="10.5" y="19.4" width="11" height="2.2" rx="0.6" fill="#4a7c59"/>
-  <rect x="10.5" y="22.8" width="11" height="2.2" rx="0.6" fill="#8b6914"/>
-  <circle cx="16" cy="24.8" r="1.1" fill="#c9a84c"/>
+  <rect x="8" y="13.5" width="16" height="13.5" rx="2.5" fill="#1a1612" stroke="#f5ecd5" stroke-width="1.5"/>
+  <rect x="10.5" y="16.2" width="11" height="2.3" rx="0.6" fill="#c9a84c"/>
+  <rect x="10.5" y="19.6" width="11" height="2.3" rx="0.6" fill="#4a7c59"/>
+  <rect x="10.5" y="23" width="11" height="2.3" rx="0.6" fill="#c9a84c"/>
+  <circle cx="16" cy="25.2" r="1.2" fill="#f5ecd5"/>
 </svg>
