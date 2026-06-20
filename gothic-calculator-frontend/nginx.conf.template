@@ -20,4 +20,8 @@ server {
     location __BASE_PATH__/ {
         try_files $uri $uri/ __BASE_PATH__/index.html;
     }
+
+    location = __BASE_PATH__/index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
 }
