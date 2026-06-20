@@ -20,8 +20,10 @@ export interface LockSolveResponse {
   error?: string;
 }
 
+export const DEFAULT_LOCK_NAME = 'my lock';
+
 export const TOWER_CHEST_TEMPLATE: LockDefinition = {
-  name: 'Second chest in the tower',
+  name: DEFAULT_LOCK_NAME,
   rules: ['3r, 6l', '-', '1r, 4l, 6r', '2r, 5r, 6l', '-', '3l'],
   start: [5, 3, 6, 7, 2, 7],
 };

@@ -1,7 +1,7 @@
-import { LockDefinition, MAX_PLATES, MIN_PLATES, MIN_POSITION, MAX_POSITION } from '../models/lock.models';
+import { DEFAULT_LOCK_NAME, LockDefinition, MAX_PLATES, MIN_PLATES, MIN_POSITION, MAX_POSITION } from '../models/lock.models';
 
 export function serializeLock(definition: LockDefinition): string {
-  const name = definition.name.trim() || 'my lock';
+  const name = definition.name.trim() || DEFAULT_LOCK_NAME;
   const lines = [`Name: ${name}`, 'Rules:'];
 
   definition.rules.forEach((rule, index) => {
@@ -70,7 +70,7 @@ export function parseLockText(text: string): LockDefinition {
     throw new Error('Число правил не совпадает с числом стартовых позиций');
   }
 
-  return { name, rules, start };
+  return { name: name.trim() || DEFAULT_LOCK_NAME, rules, start };
 }
 
 export function validateLock(definition: LockDefinition): string | null {
