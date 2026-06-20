@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build and test C solver
+        run: |
+          make test
+
+      - name: Build and test .NET API
+        run: dotnet test
+
+      - name: Validate Docker Compose config
+        run: docker compose config
+
+      - name: Build Docker images
+        run: docker compose build

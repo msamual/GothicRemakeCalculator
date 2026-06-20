@@ -3,6 +3,7 @@ services:
     build:
       context: .
       target: api
+    restart: unless-stopped
     environment:
       ASPNETCORE_URLS: http://+:8080
       GOTHIC_LOCK_BIN: /app/gothic-lock
@@ -17,8 +18,9 @@ services:
     build:
       context: .
       target: frontend
+    restart: unless-stopped
     ports:
-      - "8080:80"
+      - "${APP_PORT:-8080}:80"
     depends_on:
       api:
         condition: service_healthy

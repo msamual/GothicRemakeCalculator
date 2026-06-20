@@ -135,6 +135,84 @@ Second chest in the tower
   ...
 ```
 
+## Деплой на Ubuntu (GitHub Actions)
+
+Используется **self-hosted runner** на сервере (как в проекте iq): при push в `main` GitHub Actions запускает `deploy.sh` прямо на машине.
+
+### 1. Подготовка сервера
+
+```bash
+# Docker + Compose plugin
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin curl git
+sudo usermod -aG docker $USER
+# перелогиниться, чтобы группа docker применилась
+```
+
+### 2. Self-hosted runner
+
+В GitHub: **Settings → Actions → Runners → New self-hosted runner → Linux**.
+
+На сервере (отдельный пользователь, например `deploy`):
+
+```bash
+mkdir -p ~/actions-runner && cd ~/actions-runner
+# скачать архив и checksum с страницы GitHub (версия может отличаться)
+curl -o actions-runner-linux-x64-2.321.0.tar.gz -L \
+  https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
+tar xzf ./actions-runner-linux-x64-*.tar.gz
+./config.sh --url https://github.com/<owner>/GothicCalculator --token <TOKEN>
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
+
+Runner должен быть **online** перед первым деплоем.
+
+### 3. Workflows
+
+| Workflow | Триггер | Runner | Действие |
+|----------|---------|--------|----------|
+| `test.yml` | push / PR в `main` | `ubuntu-latest` | `make test`, `dotnet test`, сборка Docker |
+| `deploy.yml` | push в `main`, manual | `self-hosted` | `./deploy.sh` |
+
+### 4. Порт и ручной деплой
+
+По умолчанию приложение слушает порт **8080**. Можно переопределить:
+
+```bash
+export APP_PORT=8080
+./deploy.sh
+```
+
+Или добавить в systemd/svc runner'а переменную окружения `APP_PORT`.
+
+### 5. Nginx + HTTPS (опционально)
+
+Пример прокси на поддомен:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name gothic.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### 6. Проверка после деплоя
+
+```bash
+curl http://127.0.0.1:8080/api/lock/health
+docker compose ps
+docker compose logs -f api
+```
+
 ## Структура проекта
 
 ```

@@ -1,0 +1,20 @@
+.git/
+.github/
+.vscode/
+.cursor/
+
+# Build artifacts
+gothic-lock
+test_solver
+**/bin/
+**/obj/
+**/dist/
+**/.angular/
+
+# Frontend deps (rebuilt in Docker)
+gothic-calculator-frontend/node_modules/
+
+*.user
+*.swp
+.DS_Store
+*.log
