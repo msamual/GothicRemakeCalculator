@@ -18,6 +18,7 @@ typedef struct {
 
 void solution_init(Solution *sol);
 void solution_free(Solution *sol);
+int solution_line_count(const Solution *sol);
 
 SolveResult solve_lock(const LockState *lock, Solution *sol);
 

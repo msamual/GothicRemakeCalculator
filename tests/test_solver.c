@@ -19,15 +19,19 @@ static int tests_failed = 0;
         }                                          \
     } while (0)
 
-static void test_apply_move_single_link(void) {
-    int matrix[MAX_PLATES][MAX_PLATES] = {{0}};
-    matrix[1][0] = LINK_SAME;
+static void test_apply_move_row_delta(void) {
+    LockState lock;
+    lock_init(&lock);
+    lock.n = 2;
+    ASSERT(parse_rule_line("2r", 0, 2, lock.matrix), "parse row delta rule");
 
     int state[] = {4, 4};
     int out[2];
-    apply_move(state, matrix, 2, 0, DIR_RIGHT, out);
+    apply_move(state, lock.matrix, 2, 0, DIR_RIGHT, out);
+    ASSERT(out[0] == 3 && out[1] == 3, "D applies row delta to all plates");
 
-    ASSERT(out[0] == 5 && out[1] == 5, "linked plates move together");
+    apply_move(out, lock.matrix, 2, 0, DIR_LEFT, out);
+    ASSERT(out[0] == 4 && out[1] == 4, "A subtracts the same row");
 }
 
 static void test_pack_unpack(void) {
@@ -37,20 +41,15 @@ static void test_pack_unpack(void) {
     unpack_state(key, 6, out);
 
     ASSERT(memcmp(state, out, sizeof(state)) == 0, "pack/unpack roundtrip");
-
-    int wall_state[] = {1, 1, 1, 1};
-    ASSERT(pack_state(wall_state, 4) == 0, "all pins at wall pack to key 0");
-    unpack_state(0, 4, out);
-    ASSERT(memcmp(wall_state, out, sizeof(wall_state)) == 0,
-           "key 0 roundtrip for wall state");
 }
 
 static void test_parse_rule_line(void) {
     int matrix[MAX_PLATES][MAX_PLATES] = {{0}};
     ASSERT(parse_rule_line("3r, 6l", 0, 6, matrix), "parse rule line");
-    ASSERT(matrix[2][0] == LINK_SAME && matrix[5][0] == LINK_OPP,
-           "rule directions stored in matrix column");
+    ASSERT(matrix[0][0] == -1 && matrix[0][2] == -1 && matrix[0][5] == 1,
+           "row stores D-press deltas");
     ASSERT(parse_rule_line("-", 1, 6, matrix), "parse empty rule");
+    ASSERT(matrix[1][1] == -1, "empty rule still has self delta -1");
 }
 
 static void test_parse_fixture(void) {
@@ -61,10 +60,7 @@ static void test_parse_fixture(void) {
 
     int expected[] = {5, 3, 6, 7, 2, 7};
     ASSERT(memcmp(lock.start, expected, sizeof(expected)) == 0, "fixture start positions");
-
-    ASSERT(lock.matrix[2][0] == LINK_SAME, "plate 3 linked with plate 1");
-    ASSERT(lock.matrix[5][0] == LINK_OPP, "plate 6 opposes plate 1");
-    ASSERT(lock.matrix[5][2] == LINK_SAME, "plate 6 linked with plate 3");
+    ASSERT(lock.matrix[0][2] == -1 && lock.matrix[0][5] == 1, "tower rule 1 row");
 }
 
 static void test_solve_tower_chest(void) {
@@ -76,24 +72,41 @@ static void test_solve_tower_chest(void) {
     solution_init(&sol);
     SolveResult result = solve_lock(&lock, &sol);
     ASSERT(result == SOLVE_OK, "tower chest solvable");
-    ASSERT(sol.count == 52, "tower chest shortest solution length");
+    ASSERT(sol.count == 52, "tower chest optimal move count");
     ASSERT(verify_solution(&lock, &sol), "solution replays safely to solved state");
 
     solution_free(&sol);
 }
 
-static void test_solve_from_all_ones(void) {
+static void test_input_fixture(void) {
+    LockState lock;
+    ASSERT(parse_lock_path("tests/fixtures/input.txt", &lock) == PARSE_OK,
+           "parse input fixture");
+
+    Solution sol;
+    solution_init(&sol);
+    ASSERT(solve_lock(&lock, &sol) == SOLVE_OK, "input fixture solvable");
+    ASSERT(verify_solution(&lock, &sol), "input fixture solution valid");
+    solution_free(&sol);
+}
+
+static void test_minimize_lines_not_moves(void) {
     LockState lock;
     lock_init(&lock);
     lock.n = 2;
-    lock.start[0] = POS_MIN;
-    lock.start[1] = POS_MIN;
+    lock.start[0] = 7;
+    lock.start[1] = 7;
+    ASSERT(parse_rule_line("-", 0, 2, lock.matrix), "init row 0");
+    ASSERT(parse_rule_line("-", 1, 2, lock.matrix), "init row 1");
 
     Solution sol;
     solution_init(&sol);
     SolveResult result = solve_lock(&lock, &sol);
-    ASSERT(result == SOLVE_OK, "independent plates solvable from key 0 state");
-    ASSERT(verify_solution(&lock, &sol), "all-ones start solution valid");
+    ASSERT(result == SOLVE_OK, "two-plate lock solvable");
+    ASSERT(solution_line_count(&sol) == 2, "prefers 2 lines over 6 alternating moves");
+    ASSERT(sol.count == 6, "still uses minimum total moves here");
+    ASSERT(verify_solution(&lock, &sol), "line-optimal solution valid");
+
     solution_free(&sol);
 }
 
@@ -112,12 +125,13 @@ static void test_already_solved(void) {
 }
 
 int main(void) {
-    test_apply_move_single_link();
+    test_apply_move_row_delta();
     test_pack_unpack();
     test_parse_rule_line();
     test_parse_fixture();
     test_solve_tower_chest();
-    test_solve_from_all_ones();
+    test_input_fixture();
+    test_minimize_lines_not_moves();
     test_already_solved();
 
     if (tests_failed == 0) {

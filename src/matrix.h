@@ -3,7 +3,10 @@
 
 #include "lock.h"
 
-/* Parse a rules line like "3r, 6l" or "-" into matrix row `turned` (0-based). */
+/* Build row `turned`: pin/plate position deltas when tumblers[turned] is pressed [D]. */
 bool parse_rule_line(const char *line, int turned, int n, int matrix[][MAX_PLATES]);
+
+bool apply_move_legal(const int state[], const int matrix[][MAX_PLATES],
+                      int n, int plate, int dir, int out[]);
 
 #endif

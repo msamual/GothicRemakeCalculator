@@ -10,9 +10,11 @@ void lock_init(LockState *lock) {
 
 void apply_move(const int state[], const int matrix[][MAX_PLATES],
                 int n, int plate, int dir, int out[]) {
+    /* Plate positions 1–7 (1 = right wall, 7 = left). matrix[t][i] is the delta
+     * for plate i when [D] is pressed on t; [A] subtracts the same row. */
+    int sgn = (dir == DIR_RIGHT) ? 1 : -1;
     for (int i = 0; i < n; i++) {
-        int effect = (i == plate) ? dir : dir * matrix[i][plate];
-        out[i] = state[i] + effect;
+        out[i] = state[i] + sgn * matrix[plate][i];
     }
 }
 

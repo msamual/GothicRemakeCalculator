@@ -33,7 +33,9 @@ void print_help(FILE *out) {
         "    1: 3r, 6l     (plate 3 moves right, plate 6 moves left when plate 1 turns right)\n"
         "    2: -          (no couplings)\n"
         "  Start:\n"
-        "    [5, 3, 6, 7, 2, 7]   (pin positions 1-7, goal is 4)\n"
+        "    [5, 3, 6, 7, 2, 7]   (plate positions: 1 = right wall, 7 = left, goal 4)\n"
+        "\n"
+        "Rules are recorded by pressing [D] on each tumbler. [A] subtracts the same row.\n"
         "\n"
         "In game:\n"
         "  D — slide plate right, A — slide plate left\n"
@@ -91,7 +93,8 @@ void print_solution(FILE *out, const LockState *lock, const Solution *sol) {
     if (lock->name[0] != '\0') {
         fprintf(out, "%s\n", lock->name);
     }
-    fprintf(out, "Решение (%d шагов):\n", sol->count);
+    int lines = solution_line_count(sol);
+    fprintf(out, "Решение (%d строк, %d шагов):\n", lines, sol->count);
 
     int i = 0;
     while (i < sol->count) {

@@ -10,12 +10,8 @@
 #define MIN_PLATES 2
 #define MAX_PLATES 8
 
-#define LINK_NONE 0
-#define LINK_SAME 1
-#define LINK_OPP -1
-
-#define DIR_LEFT -1
-#define DIR_RIGHT 1
+#define DIR_LEFT -1   /* [A] plate left */
+#define DIR_RIGHT 1   /* [D] plate right */
 
 typedef struct {
     int plate; /* 0-based index */

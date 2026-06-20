@@ -1,7 +1,6 @@
 #include "matrix.h"
 
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 
 static const char *skip_ws(const char *s) {
@@ -12,8 +11,12 @@ static const char *skip_ws(const char *s) {
 }
 
 bool parse_rule_line(const char *line, int turned, int n, int matrix[][MAX_PLATES]) {
-    const char *p = skip_ws(line);
+    for (int i = 0; i < n; i++) {
+        matrix[turned][i] = 0;
+    }
+    matrix[turned][turned] = -1;
 
+    const char *p = skip_ws(line);
     if (*p == '-' && (p[1] == '\0' || isspace((unsigned char)p[1]))) {
         return true;
     }
@@ -38,9 +41,8 @@ bool parse_rule_line(const char *line, int turned, int n, int matrix[][MAX_PLATE
             return false;
         }
 
-        int link = (*p == 'r') ? LINK_SAME : LINK_OPP;
+        matrix[turned][target - 1] += (*p == 'r') ? -1 : 1;
         p++;
-        matrix[target - 1][turned] = link;
 
         p = skip_ws(p);
         if (*p == ',') {
@@ -51,4 +53,10 @@ bool parse_rule_line(const char *line, int turned, int n, int matrix[][MAX_PLATE
     }
 
     return true;
+}
+
+bool apply_move_legal(const int state[], const int matrix[][MAX_PLATES],
+                      int n, int plate, int dir, int out[]) {
+    apply_move(state, matrix, n, plate, dir, out);
+    return is_valid_state(out, n);
 }

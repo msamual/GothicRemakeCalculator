@@ -1,0 +1,9 @@
+Name: input
+Rules:
+1: 5r
+2: 1r, 3l, 5l
+3: 1r, 2l
+4: 1r, 2l
+5: 4l
+Start:
+[7, 1, 2, 2, 5]
