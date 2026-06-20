@@ -18,6 +18,8 @@ services:
     build:
       context: .
       target: frontend
+      args:
+        BASE_PATH: ${BASE_PATH:-GothicReamakeLockPuzzleCalculator}
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8080}:80"

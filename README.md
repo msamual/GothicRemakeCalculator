@@ -33,7 +33,7 @@ make docker-up
 docker compose up -d --build
 ```
 
-Откройте http://localhost:8080
+Откройте http://localhost:8080/GothicReamakeLockPuzzleCalculator/
 
 ### Локальная разработка
 
@@ -150,6 +150,21 @@ sudo usermod -aG docker $USER
 # перелогиниться, чтобы группа docker применилась
 ```
 
+**Важно для self-hosted runner:** пользователь, под которым работает runner (тот, кто запускал `./config.sh`), тоже должен быть в группе `docker`:
+
+```bash
+sudo usermod -aG docker <runner-user>
+# перезапустить runner (из каталога actions-runner):
+sudo ./svc.sh stop && sudo ./svc.sh start
+```
+
+Либо настрой passwordless sudo для docker (тогда `deploy.sh` использует `sudo docker` автоматически):
+
+```bash
+# /etc/sudoers.d/github-runner-docker
+<runner-user> ALL=(ALL) NOPASSWD: /usr/bin/docker, /usr/bin/docker-compose
+```
+
 `deploy.sh` автоматически использует `docker compose` или `docker-compose` — что установлено на сервере.
 
 ### 2. Self-hosted runner
@@ -189,29 +204,25 @@ export APP_PORT=8080
 
 Или добавить в systemd/svc runner'а переменную окружения `APP_PORT`.
 
-### 5. Nginx + HTTPS (опционально)
+### 5. Nginx на msamual.online
 
-Пример прокси на поддомен:
+Приложение публикуется по пути:
 
-```nginx
-server {
-    listen 443 ssl;
-    server_name gothic.example.com;
+**https://msamual.online/GothicReamakeLockPuzzleCalculator/**
 
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+На сервере добавьте фрагмент из [`deploy/nginx-msamual.online.conf`](deploy/nginx-msamual.online.conf) в блок `server` для `msamual.online`, затем:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
 ```
+
+Контейнер слушает `:8080` и сам обслуживает подпуть `/GothicReamakeLockPuzzleCalculator/`.
 
 ### 6. Проверка после деплоя
 
 ```bash
-curl http://127.0.0.1:8080/api/lock/health
+curl http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health
+curl -k https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health
 docker compose ps
 docker compose logs -f api
 ```

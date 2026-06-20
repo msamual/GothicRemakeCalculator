@@ -28,13 +28,16 @@ EXPOSE 8080
 ENTRYPOINT ["dotnet", "GothicCalculatorApi.dll"]
 
 FROM node:22-bookworm-slim AS frontend-build
+ARG BASE_PATH=GothicReamakeLockPuzzleCalculator
 WORKDIR /app
 COPY gothic-calculator-frontend/package*.json ./
 RUN npm ci
 COPY gothic-calculator-frontend/ ./
-RUN npm run build
+RUN npm run build -- --base-href=/${BASE_PATH}/
 
 FROM nginx:1.27-alpine AS frontend
-COPY gothic-calculator-frontend/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=frontend-build /app/dist/gothic-calculator-frontend/browser /usr/share/nginx/html
+ARG BASE_PATH=GothicReamakeLockPuzzleCalculator
+COPY gothic-calculator-frontend/nginx.conf.template /tmp/nginx.conf.template
+RUN sed "s|__BASE_PATH__|/${BASE_PATH}|g" /tmp/nginx.conf.template > /etc/nginx/conf.d/default.conf
+COPY --from=frontend-build /app/dist/gothic-calculator-frontend/browser /usr/share/nginx/html/${BASE_PATH}
 EXPOSE 80
