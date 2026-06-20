@@ -61,6 +61,8 @@ setup_docker() {
     else
       COMPOSE_CMD=(docker-compose)
     fi
+    echo "WARNING: Using deprecated docker-compose v1."
+    echo "Install the Compose plugin to avoid ContainerConfig errors: sudo apt install docker-compose-plugin"
     echo "Using: ${COMPOSE_CMD[*]} -p ${COMPOSE_PROJECT_NAME}"
   else
     echo "Neither 'docker compose' nor 'docker-compose' is available."
@@ -119,6 +121,9 @@ if [ "${COMPOSE_MODE}" = "plugin" ]; then
     wait_for_health
   }
 else
+  # docker-compose v1 cannot recreate containers on modern Docker (KeyError: ContainerConfig).
+  echo "Removing old containers before up (docker-compose v1 workaround)..."
+  run_compose rm -f -s 2>/dev/null || true
   run_compose up -d --remove-orphans
   wait_for_health
 fi
