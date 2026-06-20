@@ -27,6 +27,17 @@ sudo nginx -t
 sudo systemctl reload nginx
 echo "Nginx reloaded."
 
-echo "Test:"
+echo "Test (HTTP):"
 curl -fsS "http://127.0.0.1:8080/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo
 curl -fsS "http://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" && echo
+
+if curl -fsS "https://msamual.online/GothicReamakeLockPuzzleCalculator/api/lock/health" >/dev/null 2>&1; then
+  echo "HTTPS is configured."
+else
+  echo
+  echo "HTTPS is NOT configured yet. Browsers often open https:// by default and fail."
+  echo "Open in browser: http://msamual.online/GothicReamakeLockPuzzleCalculator/"
+  echo "To enable HTTPS:"
+  echo "  sudo apt install -y certbot python3-certbot-nginx"
+  echo "  sudo certbot --nginx -d msamual.online"
+fi
