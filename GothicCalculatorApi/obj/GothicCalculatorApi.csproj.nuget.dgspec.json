@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/msamual/projects/GothicCalculator/GothicCalculatorApi/GothicCalculatorApi.csproj": {}
+  },
+  "projects": {
+    "/Users/msamual/projects/GothicCalculator/GothicCalculatorApi/GothicCalculatorApi.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/msamual/projects/GothicCalculator/GothicCalculatorApi/GothicCalculatorApi.csproj",
+        "projectName": "GothicCalculatorApi",
+        "projectPath": "/Users/msamual/projects/GothicCalculator/GothicCalculatorApi/GothicCalculatorApi.csproj",
+        "packagesPath": "/var/folders/2b/810v3k4n5ms29rqf1kt43g5c0000gn/T/cursor-sandbox-cache/d98cca007c89dca0a878aa62967e6f55/nuget",
+        "outputPath": "/Users/msamual/projects/GothicCalculator/GothicCalculatorApi/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/msamual/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,10 @@
 # Gothic Lock Calculator
 
-Консольный калькулятор взлома замков для **Gothic 1 Remake**. Программа принимает описание замка (связи между пластинами и стартовые позиции) и находит **безопасную** последовательность ходов с **минимальным числом строк** в инструкции. При равном числе строк выбирается путь с меньшим общим числом нажатий.
+Калькулятор взлома замков для **Gothic 1 Remake**. Программа принимает описание замка (связи между пластинами и стартовые позиции) и находит **безопасную** последовательность ходов с **минимальным числом строк** в инструкции. При равном числе строк выбирается путь с меньшим общим числом нажатий.
 
-## Сборка
+Доступны **консольный солвер** и **веб-интерфейс** (Angular + .NET API).
+
+## Сборка CLI
 
 ```bash
 make
@@ -11,14 +13,84 @@ make test
 
 Бинарник: `gothic-lock`
 
-## Использование
+## Использование CLI
 
 ```bash
 gothic-lock tests/fixtures/tower_chest.txt
+gothic-lock --json tests/fixtures/tower_chest.txt
 gothic-lock - < my_lock.txt
 gothic-lock --template
 gothic-lock --help
 ```
+
+## Веб-интерфейс
+
+### Docker (рекомендуется)
+
+```bash
+make docker-up
+# или
+docker compose up -d --build
+```
+
+Откройте http://localhost:8080
+
+### Локальная разработка
+
+Терминал 1 — API:
+
+```bash
+make
+cd GothicCalculatorApi
+dotnet run
+```
+
+Терминал 2 — frontend:
+
+```bash
+cd gothic-calculator-frontend
+npm install
+npm start
+```
+
+Откройте http://localhost:4200 (запросы `/api` проксируются на http://localhost:5000).
+
+## API
+
+### `GET /api/lock/health`
+
+Проверка состояния API и наличия бинарника солвера.
+
+### `POST /api/lock/solve`
+
+**Request:**
+
+```json
+{
+  "name": "Second chest in the tower",
+  "rules": ["3r, 6l", "-", "1r, 4l, 6r", "2r, 5r, 6l", "-", "3l"],
+  "start": [5, 3, 6, 7, 2, 7]
+}
+```
+
+**Response (успех):**
+
+```json
+{
+  "ok": true,
+  "name": "Second chest in the tower",
+  "status": "solved",
+  "lines": 18,
+  "steps": 52,
+  "instructions": [
+    { "plate": 1, "count": 1, "direction": "left" }
+  ]
+}
+```
+
+**Response (ошибка):** HTTP 400, `"ok": false`, поле `"error"`.
+
+Переменная окружения `GOTHIC_LOCK_BIN` — путь к бинарнику (по умолчанию `../gothic-lock` относительно API).
 
 ## Формат ввода
 
@@ -54,13 +126,24 @@ Start:
 | **A** | Пластина влево |
 | **W** / **S** | Переключение между пластинами |
 
-## Пример вывода
+## Пример вывода CLI
 
 ```
 Second chest in the tower
 Решение (18 строк, 52 шагов):
   1 пластина 1 раз вправо
   ...
+```
+
+## Структура проекта
+
+```
+GothicCalculator/
+├── src/                          # C-солвер
+├── GothicCalculatorApi/          # .NET 9 Web API
+├── gothic-calculator-frontend/   # Angular SPA
+├── docker-compose.yml
+└── Dockerfile
 ```
 
 ## Лицензия

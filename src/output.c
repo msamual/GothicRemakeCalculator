@@ -24,6 +24,7 @@ void print_help(FILE *out) {
         "Usage:\n"
         "  gothic-lock [file]      Solve lock from input file\n"
         "  gothic-lock -           Read lock definition from stdin\n"
+        "  gothic-lock --json -    Solve and print JSON to stdout\n"
         "  gothic-lock --template  Print example input format\n"
         "  gothic-lock --help      Show this help\n"
         "\n"
@@ -111,4 +112,81 @@ void print_solution(FILE *out, const LockState *lock, const Solution *sol) {
                 m.plate + 1, count, times_word(count), dir);
         i += count;
     }
+}
+
+static void json_escape_string(FILE *out, const char *s) {
+    fputc('"', out);
+    for (const unsigned char *p = (const unsigned char *)s; *p; p++) {
+        switch (*p) {
+        case '"':
+            fputs("\\\"", out);
+            break;
+        case '\\':
+            fputs("\\\\", out);
+            break;
+        case '\n':
+            fputs("\\n", out);
+            break;
+        case '\r':
+            fputs("\\r", out);
+            break;
+        case '\t':
+            fputs("\\t", out);
+            break;
+        default:
+            if (*p < 0x20) {
+                fprintf(out, "\\u%04x", *p);
+            } else {
+                fputc(*p, out);
+            }
+            break;
+        }
+    }
+    fputc('"', out);
+}
+
+void print_json_error(FILE *out, const char *error) {
+    fputs("{\"ok\":false,\"error\":", out);
+    json_escape_string(out, error);
+    fputc('}', out);
+    fputc('\n', out);
+}
+
+void print_json_already_open(FILE *out, const LockState *lock) {
+    fputs("{\"ok\":true,\"name\":", out);
+    json_escape_string(out, lock->name);
+    fputs(",\"status\":\"already_open\",\"lines\":0,\"steps\":0,\"instructions\":[]}\n", out);
+}
+
+void print_json_solution(FILE *out, const LockState *lock, const Solution *sol) {
+    int lines = solution_line_count(sol);
+
+    fputs("{\"ok\":true,\"name\":", out);
+    json_escape_string(out, lock->name);
+    fprintf(out, ",\"status\":\"solved\",\"lines\":%d,\"steps\":%d,\"instructions\":[",
+            lines, sol->count);
+
+    int i = 0;
+    bool first = true;
+    while (i < sol->count) {
+        Move m = sol->moves[i];
+        int count = 1;
+        while (i + count < sol->count &&
+               sol->moves[i + count].plate == m.plate &&
+               sol->moves[i + count].dir == m.dir) {
+            count++;
+        }
+
+        if (!first) {
+            fputc(',', out);
+        }
+        first = false;
+
+        const char *dir = (m.dir == DIR_RIGHT) ? "right" : "left";
+        fprintf(out, "{\"plate\":%d,\"count\":%d,\"direction\":\"%s\"}",
+                m.plate + 1, count, dir);
+        i += count;
+    }
+
+    fputs("]}\n", out);
 }

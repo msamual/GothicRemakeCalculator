@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "ZkODYKYON+W3nl3FxxBquGh/znv91kYOmqG9sbMzMw4=",
+  "Source": "GothicCalculatorApi",
+  "BasePath": "_content/GothicCalculatorApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

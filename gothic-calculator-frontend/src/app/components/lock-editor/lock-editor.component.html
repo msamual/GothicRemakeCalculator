@@ -1,0 +1,127 @@
+<div class="editor-layout">
+  <section class="gothic-card editor-panel">
+    <header class="panel-header">
+      <h2 class="panel-title">Описание замка</h2>
+      <p class="panel-subtitle">
+        Запишите связи после нажатия <strong>D</strong> на каждой пластине и укажите стартовые позиции
+      </p>
+    </header>
+
+    <form [formGroup]="form" class="editor-form" (ngSubmit)="solve()">
+      <label class="field">
+        <span class="field__label">Название</span>
+        <input class="gothic-input" type="text" formControlName="name" placeholder="my lock" />
+      </label>
+
+      <label class="field">
+        <span class="field__label">Количество пластин</span>
+        <input
+          class="gothic-input"
+          type="number"
+          formControlName="plateCount"
+          [min]="minPlates"
+          [max]="maxPlates"
+        />
+      </label>
+
+      <div class="rules-grid">
+        <div class="rules-grid__header">
+          <span>Пластина</span>
+          <span>Правило (при D)</span>
+          <span>Старт</span>
+        </div>
+
+        @for (ruleControl of rulesControls.controls; track $index; let i = $index) {
+          <div class="rules-grid__row">
+            <span class="plate-number">{{ i + 1 }}</span>
+            <input
+              class="gothic-input"
+              type="text"
+              [formControl]="ruleControl"
+              placeholder="- или 3r, 6l"
+            />
+            <input
+              class="gothic-input"
+              type="number"
+              [formControl]="startControls.at(i)"
+              [class.invalid]="startControls.at(i).invalid"
+              [min]="minPosition"
+              [max]="maxPosition"
+            />
+          </div>
+        }
+      </div>
+
+      <div class="actions">
+        <button type="button" class="gothic-btn gothic-btn-secondary" (click)="loadTemplate()">
+          Шаблон
+        </button>
+        <button type="button" class="gothic-btn gothic-btn-secondary" (click)="openImport()">
+          Импорт
+        </button>
+        <button type="button" class="gothic-btn gothic-btn-secondary" (click)="exportText()">
+          Экспорт
+        </button>
+        <button type="submit" class="gothic-btn gothic-btn-primary" [disabled]="loading()">
+          @if (loading()) {
+            Решаем…
+          } @else {
+            Решить
+          }
+        </button>
+      </div>
+
+      @if (copyMessage()) {
+        <p class="inline-message">{{ copyMessage() }}</p>
+      }
+    </form>
+  </section>
+
+  <section class="gothic-card viz-panel">
+    <header class="panel-header">
+      <h2 class="panel-title">Пластины</h2>
+      <p class="panel-subtitle">Позиция 4 — центр (цель взлома)</p>
+    </header>
+
+    @for (position of positions(); track $index; let i = $index) {
+      <app-plate-track [plateIndex]="i + 1" [position]="position" />
+    }
+  </section>
+
+  <app-solution-panel
+    [response]="response()"
+    [loading]="loading()"
+    [error]="clientError()"
+  />
+</div>
+
+@if (showImport()) {
+  <div class="import-backdrop" (click)="closeImport()">
+    <div class="import-dialog gothic-card" (click)="$event.stopPropagation()">
+      <header class="panel-header">
+        <h2 class="panel-title">Импорт замка</h2>
+        <p class="panel-subtitle">Вставьте текст в формате nameless-locksmith</p>
+      </header>
+
+      <textarea
+        class="gothic-input import-textarea"
+        [value]="importText()"
+        (input)="onImportTextChange($any($event.target).value)"
+        rows="14"
+      ></textarea>
+
+      @if (importError()) {
+        <p class="inline-message inline-message--error">{{ importError() }}</p>
+      }
+
+      <div class="actions actions--dialog">
+        <button type="button" class="gothic-btn gothic-btn-secondary" (click)="closeImport()">
+          Отмена
+        </button>
+        <button type="button" class="gothic-btn gothic-btn-primary" (click)="applyImport()">
+          Применить
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,51 @@
+<section class="gothic-card solution-panel">
+  <header class="panel-header">
+    <h2 class="panel-title">Решение</h2>
+    <p class="panel-subtitle">Минимальное число строк инструкции для безопасного взлома</p>
+  </header>
+
+  @if (loading()) {
+    <div class="solution-state">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Ищем безопасный путь…</p>
+    </div>
+  } @else if (error()) {
+    <div class="solution-state solution-state--error">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (!response()) {
+    <div class="solution-state">
+      <p>Заполните замок и нажмите «Решить».</p>
+    </div>
+  } @else if (response()?.status === 'already_open') {
+    <div class="solution-state solution-state--success">
+      <p>Замок уже открыт — все пластины в центре.</p>
+    </div>
+  } @else if (response()?.ok && response()?.instructions) {
+    <div class="solution-stats">
+      <div class="stat">
+        <span class="stat__label">Строк</span>
+        <span class="stat__value">{{ response()?.lines }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat__label">Шагов</span>
+        <span class="stat__value">{{ response()?.steps }}</span>
+      </div>
+    </div>
+
+    <ol class="instruction-list">
+      @for (instruction of response()?.instructions; track $index) {
+        <li>{{ formatInstruction(instruction) }}</li>
+      }
+    </ol>
+
+    <p class="solution-note">
+      В игре переключайтесь между пластинами клавишами <strong>W</strong> / <strong>S</strong>,
+      двигайте пластину <strong>D</strong> (вправо) или <strong>A</strong> (влево).
+    </p>
+  } @else {
+    <div class="solution-state solution-state--error">
+      <p>{{ response()?.error || 'Не удалось найти решение' }}</p>
+    </div>
+  }
+</section>

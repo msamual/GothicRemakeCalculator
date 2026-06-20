@@ -1,0 +1,24 @@
+services:
+  api:
+    build:
+      context: .
+      target: api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      GOTHIC_LOCK_BIN: /app/gothic-lock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/lock/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      target: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_healthy

@@ -6,7 +6,7 @@ SRC     = src/lock.c src/matrix.c src/parser.c src/solver.c src/output.c
 MAIN    = src/main.c
 TEST    = tests/test_solver.c
 
-.PHONY: all clean re test
+.PHONY: all clean re test docker-up docker-down
 
 all: gothic-lock
 
@@ -21,3 +21,9 @@ clean:
 	rm -f gothic-lock test_solver
 
 re: clean all
+
+docker-up:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down

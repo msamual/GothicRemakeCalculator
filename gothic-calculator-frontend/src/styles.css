@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gothic-bg: #0f0d0a;
+  --color-gothic-card: #1a1612;
+  --color-gothic-border: #3d3428;
+  --color-gothic-gold: #c9a84c;
+  --color-gothic-bronze: #8b6914;
+  --color-gothic-text: #e8dcc8;
+  --color-gothic-muted: #9a8f7a;
+  --color-gothic-goal: #4a7c59;
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background:
+    radial-gradient(ellipse at top, #1f1812 0%, var(--color-gothic-bg) 55%),
+    var(--color-gothic-bg);
+  color: var(--color-gothic-text);
+}
+
+.gothic-card {
+  background: linear-gradient(180deg, #221c16 0%, var(--color-gothic-card) 100%);
+  border: 1px solid var(--color-gothic-border);
+  box-shadow:
+    inset 0 1px 0 rgb(201 168 76 / 0.08),
+    0 12px 32px rgb(0 0 0 / 0.35);
+}
+
+.gothic-input {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-gothic-border);
+  background: rgb(15 13 10 / 0.8);
+  color: var(--color-gothic-text);
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gothic-input:focus {
+  outline: none;
+  border-color: var(--color-gothic-gold);
+  box-shadow: 0 0 0 2px rgb(201 168 76 / 0.15);
+}
+
+.gothic-input.invalid {
+  border-color: #b44;
+}
+
+.gothic-btn {
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-gothic-bronze);
+  background: linear-gradient(180deg, #6b5310 0%, #4a3a0c 100%);
+  color: #f5ecd5;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+.gothic-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gothic-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.gothic-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.gothic-btn-secondary {
+  border-color: var(--color-gothic-border);
+  background: rgb(26 22 18 / 0.9);
+  color: var(--color-gothic-text);
+}
+
+.gothic-btn-primary {
+  border-color: var(--color-gothic-gold);
+  background: linear-gradient(180deg, #a8862f 0%, #7a6118 100%);
+}
