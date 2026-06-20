@@ -6,8 +6,16 @@ set -euo pipefail
 BASE_PATH="/GothicReamakeLockPuzzleCalculator"
 PORT="${APP_PORT:-8080}"
 
-echo "=== Docker containers ==="
-docker compose ps 2>/dev/null || docker-compose ps 2>/dev/null || echo "docker compose not available"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-gothiclock}"
+
+echo "=== Docker containers (${COMPOSE_PROJECT_NAME}) ==="
+docker compose -p "${COMPOSE_PROJECT_NAME}" ps 2>/dev/null \
+  || docker-compose -p "${COMPOSE_PROJECT_NAME}" ps 2>/dev/null \
+  || echo "docker compose not available"
+
+echo
+echo "=== Other containers on port ${PORT} ==="
+docker ps --filter "publish=${PORT}" --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null || true
 
 echo
 echo "=== Local app health (must be 200) ==="

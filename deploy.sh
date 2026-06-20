@@ -10,6 +10,7 @@ case "${BASE_PATH}" in
   *) BASE_PATH="/${BASE_PATH}" ;;
 esac
 HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:${APP_PORT}${BASE_PATH}/api/lock/health}"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-gothiclock}"
 
 COMPOSE_MODE=""
 DOCKER_CMD=()
@@ -17,9 +18,22 @@ COMPOSE_CMD=()
 
 run_compose() {
   if [ "${COMPOSE_MODE}" = "plugin" ]; then
-    "${DOCKER_CMD[@]}" compose "$@"
+    "${DOCKER_CMD[@]}" compose -p "${COMPOSE_PROJECT_NAME}" "$@"
   else
-    "${COMPOSE_CMD[@]}" "$@"
+    "${COMPOSE_CMD[@]}" -p "${COMPOSE_PROJECT_NAME}" "$@"
+  fi
+}
+
+run_compose_legacy_down() {
+  local legacy=$1
+  if [ "${COMPOSE_MODE}" = "plugin" ]; then
+    "${DOCKER_CMD[@]}" compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
+  else
+    if [ "${DOCKER_CMD[0]}" = "sudo" ]; then
+      sudo docker-compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
+    else
+      docker-compose -p "${legacy}" down --remove-orphans 2>/dev/null || true
+    fi
   fi
 }
 
@@ -39,7 +53,7 @@ setup_docker() {
 
   if "${DOCKER_CMD[@]}" compose version &>/dev/null 2>&1; then
     COMPOSE_MODE="plugin"
-    echo "Using: ${DOCKER_CMD[*]} compose"
+    echo "Using: ${DOCKER_CMD[*]} compose -p ${COMPOSE_PROJECT_NAME}"
   elif command -v docker-compose &>/dev/null; then
     COMPOSE_MODE="standalone"
     if [ "${DOCKER_CMD[0]}" = "sudo" ]; then
@@ -47,13 +61,34 @@ setup_docker() {
     else
       COMPOSE_CMD=(docker-compose)
     fi
-    echo "Using: ${COMPOSE_CMD[*]}"
+    echo "Using: ${COMPOSE_CMD[*]} -p ${COMPOSE_PROJECT_NAME}"
   else
     echo "Neither 'docker compose' nor 'docker-compose' is available."
     echo "Install the Compose plugin: sudo apt install docker-compose-plugin"
     echo "Or standalone Compose: sudo apt install docker-compose"
     exit 1
   fi
+}
+
+wait_for_health() {
+  echo "Waiting for health check at ${HEALTH_URL}..."
+  for attempt in $(seq 1 45); do
+    if curl -fsS "${HEALTH_URL}" >/dev/null; then
+      echo "Health check passed."
+      return 0
+    fi
+
+    if [ "${attempt}" -eq 45 ]; then
+      echo "Health check failed after 45 attempts."
+      echo "API logs:"
+      run_compose logs api
+      echo "Frontend logs:"
+      run_compose logs frontend
+      return 1
+    fi
+
+    sleep 2
+  done
 }
 
 echo "Starting Gothic Lock Calculator deployment..."
@@ -66,34 +101,44 @@ fi
 setup_docker
 export APP_PORT
 export BASE_PATH="${BASE_PATH#/}"
+export COMPOSE_PROJECT_NAME
 
-echo "Stopping existing containers..."
-run_compose down || true
-
-echo "Building and starting services..."
-run_compose up --build -d
-
-echo "Waiting for health check at ${HEALTH_URL}..."
-for attempt in $(seq 1 30); do
-  if curl -fsS "${HEALTH_URL}" >/dev/null; then
-    echo "Health check passed."
-    break
-  fi
-
-  if [ "${attempt}" -eq 30 ]; then
-    echo "Health check failed after 30 attempts."
-    echo "API logs:"
-    run_compose logs api
-    echo "Frontend logs:"
-    run_compose logs frontend
-    exit 1
-  fi
-
-  sleep 2
+echo "Retiring legacy compose projects (one-time cleanup)..."
+for legacy in gothicremakecalculator gothiccalculator; do
+  run_compose_legacy_down "${legacy}"
 done
+
+echo "Building images..."
+run_compose build
+
+echo "Starting services (keeping old containers until new ones are ready)..."
+if [ "${COMPOSE_MODE}" = "plugin" ]; then
+  run_compose up -d --remove-orphans --wait || {
+    echo "Compose --wait failed, falling back to manual health check."
+    run_compose up -d --remove-orphans
+    wait_for_health
+  }
+else
+  run_compose up -d --remove-orphans
+  wait_for_health
+fi
+
+echo "Running containers:"
+run_compose ps
+
+if curl -fsS "${HEALTH_URL}" >/dev/null; then
+  echo "Local health check OK."
+else
+  echo "Local health check FAILED."
+  exit 1
+fi
+
+if curl -fsS "http://msamual.online/${BASE_PATH}/api/lock/health" >/dev/null 2>&1; then
+  echo "Public HTTP health check OK."
+else
+  echo "WARNING: public URL not reachable. Run: sudo ./deploy/install-nginx.sh"
+fi
 
 echo "Deployment completed successfully."
 echo "Local URL: http://127.0.0.1:${APP_PORT}/${BASE_PATH}/"
 echo "Public URL: https://msamual.online/${BASE_PATH}/"
-echo "Running containers:"
-run_compose ps

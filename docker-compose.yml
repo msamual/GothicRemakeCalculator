@@ -1,3 +1,5 @@
+name: gothiclock
+
 services:
   api:
     build:
